@@ -299,28 +299,23 @@ export async function processVideo(videoId: string): Promise<string | null> {
       const transitionDuration = 0.5; // 0.5 second transition between segments
       await mergeVideosWithTransition(localVideoFiles, finalVideoPath, transitionDuration);
       
-      // Upload the final merged video to Supabase storage in finalized-videos folder
-      const normalStorageFileName = `${storyId}/${videoId}.mp4`;
-      logInfo(`Uploading segment videos to regular storage as ${normalStorageFileName}`);
-      const segmentVideoURL = await uploadFile(finalVideoPath, normalStorageFileName);
-      
-      // Also upload to the finalized-videos folder at root level in Supabase storage
+      // Upload to the finalized-videos folder in Supabase storage
       const finalizedStorageFileName = `finalized-videos/${videoId}.mp4`;
-      logInfo(`Uploading finalized video to dedicated storage folder as ${finalizedStorageFileName}`);
-      const finalVideoURL = await uploadFile(finalVideoPath, finalizedStorageFileName);
+      logInfo(`Uploading finalized video to storage as ${finalizedStorageFileName}`);
+      const videoURL = await uploadFile(finalVideoPath, finalizedStorageFileName);
       
-      if (!finalVideoURL) {
+      if (!videoURL) {
         logError('Failed to upload final merged video to storage');
         await updateVideoStatus(videoId, "failed");
         // Early return so worker can move on to the next item
         return null;
       }
       
-      logSuccess(`Successfully uploaded final merged video with URL: ${finalVideoURL}`);
+      logSuccess(`Successfully uploaded video with URL: ${videoURL}`);
       
-      // Update the video record with the final URL
-      logInfo(`Updating video ${videoId} with final URL and completed status`);
-      await updateVideoStatus(videoId, "completed", finalVideoURL);
+      // Update the video record with the URL
+      logInfo(`Updating video ${videoId} with URL and completed status`);
+      await updateVideoStatus(videoId, "completed", videoURL);
       
       logSuccess(`Successfully processed and merged video ${videoId}`);
       
@@ -330,7 +325,7 @@ export async function processVideo(videoId: string): Promise<string | null> {
         logError(`Error cleaning up files for video ${videoId}`, error);
       });
       
-      return finalVideoURL;
+      return videoURL;
     } catch (mergeError) {
       logError(`Error merging videos for ${videoId}`, mergeError);
       
