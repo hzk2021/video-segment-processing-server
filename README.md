@@ -3,7 +3,6 @@ A Node.js (Express.js) server that processes videos and segments asynchronously 
 
 <sub> (P.S, I tried Serverless too but the limitations were not worth it.) </sub>
 
-
 ## Features
 
 - IP whitelisting for secure API access
@@ -23,6 +22,11 @@ A Node.js (Express.js) server that processes videos and segments asynchronously 
 - Node.js 18 or higher
 - FFmpeg must be installed on your local machine for development
 - Supabase project with PGMQ extension enabled
+
+```bash
+Note: The Supabase storage bucket must be empty and publicly accessible for now.
+```
+
 
 ### Checking FFmpeg Installation
 
