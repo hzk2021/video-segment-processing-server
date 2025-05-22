@@ -23,6 +23,8 @@ export async function transcribeAudio(audioPath: string): Promise<string> {
         "en", // Specify English language
         "--word_timestamps",
         "True", // Enable word-level timestamps
+        "--highlight_words",
+        "True", // Enable word highlighting
         "--output_format",
         "srt", // Get SRT format with timestamps
         "--output_dir",

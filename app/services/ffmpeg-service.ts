@@ -247,7 +247,7 @@ export async function createVideo(
         // Escape special characters in the path
         const escapedPath = subtitlesPath.replace(/[\\:]/g, "\\$&");
         filters.push(
-          `[v]subtitles='${escapedPath}':force_style='Alignment=2,FontSize=22,MarginV=20,PrimaryColour=&HFFFFFF&,OutlineColour=&H000000&,BorderStyle=3,Outline=1,Shadow=2'[vout]`
+          `[v]subtitles='${escapedPath}':force_style='Alignment=2,PlayResX=1920,PlayResY=1080,FontName=Arial,FontSize=75,MarginV=50,BorderStyle=3,Outline=2,Shadow=0,LineSpacing=0,MarginL=200,MarginR=200'[vout]`
         );
       }
 
@@ -460,6 +460,7 @@ export async function mergeVideosWithTransition(
           "[vout]",
           "-map",
           "[aout]",
+          "-sn", // Strip any existing subtitles
           "-c:v",
           "libx264",
           "-c:a",

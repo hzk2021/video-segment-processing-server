@@ -200,25 +200,7 @@ export async function processVideo(videoId: string): Promise<string | null> {
           const videoURL = await processSegment(segment.id);
 
           if (videoURL) {
-            // Update the segment's videoURL in the database
-            logInfo(
-              `Updating segment ${segment.id} with videoURL and completed status`
-            );
-            const { error: segmentUpdateError } = await supabasePublic
-              .from("Segment")
-              .update({ videoURL, status: "completed" })
-              .eq("id", segment.id);
-
-            if (segmentUpdateError) {
-              logError(
-                `Failed to update segment ${segment.id} videoURL`,
-                segmentUpdateError
-              );
-              hasFailedSegments = true;
-            } else {
-              logSuccess(`Updated segment ${segment.id} with videoURL`);
-            }
-
+            // Don't update segment status, just add to processed segments
             processedSegments.push({
               id: segment.id,
               videoURL,
@@ -227,30 +209,10 @@ export async function processVideo(videoId: string): Promise<string | null> {
           } else {
             logError(`Failed to process segment ${segment.id}`);
             hasFailedSegments = true;
-
-            // Update segment status to failed
-            logInfo(`Updating segment ${segment.id} status to failed`);
-            await supabasePublic
-              .from("Segment")
-              .update({ status: "failed" })
-              .eq("id", segment.id);
           }
         } catch (segmentError) {
           logError(`Error processing segment ${segment.id}`, segmentError);
           hasFailedSegments = true;
-
-          // Update segment status to failed
-          try {
-            await supabasePublic
-              .from("Segment")
-              .update({ status: "failed" })
-              .eq("id", segment.id);
-          } catch (updateError) {
-            logError(
-              `Failed to update segment ${segment.id} status to failed`,
-              updateError
-            );
-          }
         }
       }
 
